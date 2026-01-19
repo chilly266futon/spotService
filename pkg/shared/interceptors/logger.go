@@ -1,53 +1,63 @@
 package interceptors
 
 import (
+	"context"
+	"google.golang.org/grpc/metadata"
+	"time"
+
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
-type Config struct {
-	Level       string `mapstructure:"level"`
-	Development bool   `mapstructure:"development"`
-	Encoding    string `mapstructure:"encoding"`
+func LoggerInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req any,
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (any, error) {
+		start := time.Now()
+
+		traceID := GetTraceID(ctx)
+
+		resp, err := handler(ctx, req)
+
+		duration := time.Since(start)
+
+		fields := []zap.Field{
+			zap.String("method", info.FullMethod),
+			zap.Duration("duration", duration),
+		}
+
+		if traceID != "" {
+			fields = append(fields, zap.String("trace_id", traceID))
+		}
+
+		if err != nil {
+			st, _ := status.FromError(err)
+			fields = append(fields,
+				zap.String("grpc_code", st.Code().String()),
+				zap.String("error", err.Error()),
+			)
+			logger.Error("grpc request failed", fields...)
+		} else {
+			logger.Info("grpc request completed", fields...)
+		}
+
+		return resp, err
+	}
 }
 
-func New(cfg Config) (*zap.Logger, error) {
-	var config zap.Config
-
-	if cfg.Development {
-		config = zap.NewDevelopmentConfig()
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	} else {
-		config = zap.NewProductionConfig()
+func GetTraceID(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
 	}
 
-	// Set log level
-	level, err := zapcore.ParseLevel(cfg.Level)
-	if err != nil {
-		level = zapcore.InfoLevel
-	}
-	config.Level = zap.NewAtomicLevelAt(level)
-
-	// Set encoding
-	if config.Encoding != "" {
-		config.Encoding = cfg.Encoding
+	if values := md.Get("x-request-id"); len(values) > 0 {
+		return values[0]
 	}
 
-	return config.Build()
-}
-
-func NewDefault() (*zap.Logger, error) {
-	return New(Config{
-		Level:       "info",
-		Development: false,
-		Encoding:    "json",
-	})
-}
-
-func NewDevelopment() (*zap.Logger, error) {
-	return New(Config{
-		Level:       "debug",
-		Development: true,
-		Encoding:    "console",
-	})
+	return ""
 }

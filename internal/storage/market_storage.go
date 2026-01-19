@@ -45,7 +45,7 @@ func (s *MarketStorage) GetAll() []*domain.Market {
 	return result
 }
 
-func (s *MarketStorage) GetAvailbale() []*domain.Market {
+func (s *MarketStorage) GetAvailable() []*domain.Market {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
