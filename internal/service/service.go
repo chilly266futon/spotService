@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	spotv1 "spotService/gen/pb"
-	"spotService/internal/domain"
-	"spotService/internal/storage"
+	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	"github.com/chilly266futon/spotService/internal/domain"
+	"github.com/chilly266futon/spotService/internal/storage"
 )
 
 // Service реализует SpotInstrumentService

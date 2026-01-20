@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"spotService/pkg/shared/config"
-	"spotService/pkg/shared/logger"
+	"github.com/chilly266futon/spotService/pkg/shared/config"
+	"github.com/chilly266futon/spotService/pkg/shared/logger"
 )
 
 // Config конфигурация spot-service

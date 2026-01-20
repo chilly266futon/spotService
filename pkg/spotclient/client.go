@@ -3,9 +3,11 @@ package spotclient
 import (
 	"context"
 	"fmt"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	spotv1 "spotService/gen/pb"
+
+	spotv1 "github.com/chilly266futon/spotService/gen/pb"
 )
 
 type Client struct {

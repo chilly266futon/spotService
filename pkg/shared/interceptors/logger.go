@@ -2,7 +2,6 @@ package interceptors
 
 import (
 	"context"
-	"google.golang.org/grpc/metadata"
 	"time"
 
 	"go.uber.org/zap"
@@ -47,17 +46,4 @@ func LoggerInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
 
 		return resp, err
 	}
-}
-
-func GetTraceID(ctx context.Context) string {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ""
-	}
-
-	if values := md.Get("x-request-id"); len(values) > 0 {
-		return values[0]
-	}
-
-	return ""
 }

@@ -1,4 +1,5 @@
-module spotService
+module github.com/chilly266futon/spotService
+
 
 go 1.25.5
 

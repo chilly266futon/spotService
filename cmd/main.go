@@ -10,17 +10,17 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	spotv1 "spotService/gen/pb"
-	"spotService/internal/config"
-	"spotService/internal/domain"
-	"spotService/internal/service"
-	"spotService/internal/storage"
+	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	"github.com/chilly266futon/spotService/internal/config"
+	"github.com/chilly266futon/spotService/internal/domain"
+	"github.com/chilly266futon/spotService/internal/service"
+	"github.com/chilly266futon/spotService/internal/storage"
 
 	// Shared пакеты из того же репозитория
-	"spotService/pkg/shared/grpcutil"
-	"spotService/pkg/shared/health"
-	"spotService/pkg/shared/interceptors"
-	"spotService/pkg/shared/logger"
+	"github.com/chilly266futon/spotService/pkg/shared/grpcutil"
+	"github.com/chilly266futon/spotService/pkg/shared/health"
+	"github.com/chilly266futon/spotService/pkg/shared/interceptors"
+	"github.com/chilly266futon/spotService/pkg/shared/logger"
 )
 
 func main() {

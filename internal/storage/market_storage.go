@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"spotService/internal/domain"
+	"github.com/chilly266futon/spotService/internal/domain"
 	"sync"
 	"time"
 )

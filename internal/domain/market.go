@@ -1,8 +1,9 @@
 package domain
 
 import (
-	spotv1 "spotService/gen/pb"
 	"time"
+
+	spotv1 "github.com/chilly266futon/spotService/gen/pb"
 )
 
 type Market struct {
