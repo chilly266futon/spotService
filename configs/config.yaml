@@ -1,0 +1,46 @@
+server:
+  host: "localhost"
+  port: 50052
+  shutdown_interval: 10s
+
+logger:
+  level: "info"
+  development: false
+  encoding: "json"
+
+rate_limit:
+  enabled: true
+  requests_per_second: 15
+  burst: 30
+  methods:
+    ViewMarkets:
+      request_per_second: 15
+      burst: 20
+
+health:
+  enabled: true
+
+markets:
+  - id: "btc-usdt"
+    name: "BTC/USDT"
+    description: "Bitcoin to USDT"
+    enabled: true
+    allowed_roles:
+      - 1 # USER_ROLE_COMMON
+      - 2 # USER_ROLE_VERIFIED
+      - 3 # USER_ROLE_PREMIUM
+      - 4 # USER_ROLE_ADMIN
+  - id: "eth-usdt"
+    name: "ETH/USDT"
+    description: "Ethereum to USDT"
+    enabled: true
+    allowed_roles:
+        - 1 # USER_ROLE_COMMON
+        - 4 # USER_ROLE_ADMIN
+  - id: "premium_market"
+    name: "Premium Market"
+    description: "Only for premium users"
+    enabled: true
+    allowed_roles:
+        - 3 # USER_ROLE_PREMIUM
+        - 4 # USER_ROLE_ADMIN

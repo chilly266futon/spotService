@@ -6,9 +6,9 @@ import (
 )
 
 type Config struct {
-	Level       string `mapstructure:"level"`
-	Development bool   `mapstructure:"development"`
-	Encoding    string `mapstructure:"encoding"`
+	Level       string `yaml:"level"`
+	Development bool   `yaml:"development"`
+	Encoding    string `yaml:"encoding"`
 }
 
 func New(cfg Config) (*zap.Logger, error) {

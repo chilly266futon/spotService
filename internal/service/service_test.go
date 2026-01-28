@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chilly266futon/spotService/pkg/shared/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -35,7 +36,11 @@ func TestViewMarkets_ReturnsOnlyActiveMarkets(t *testing.T) {
 		},
 	}
 
-	svc := NewService(storage.NewMarketStorage(markets))
+	log, err := logger.NewDevelopment()
+	if err != nil {
+		t.Fatalf("failed to create logger: %v", err)
+	}
+	svc := NewService(storage.NewMarketStorage(markets), log)
 
 	resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{})
 
@@ -66,7 +71,12 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 		},
 	}
 
-	svc := NewService(storage.NewMarketStorage(markets))
+	log, err := logger.NewDevelopment()
+	if err != nil {
+		t.Fatalf("failed to create logger: %v", err)
+	}
+
+	svc := NewService(storage.NewMarketStorage(markets), log)
 
 	t.Run("common user sees common and public markets", func(t *testing.T) {
 		resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{
@@ -110,7 +120,11 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 }
 
 func TestViewMarkets_InvalidRequest(t *testing.T) {
-	svc := NewService(storage.NewMarketStorage([]*domain.Market{}))
+	log, err := logger.NewDevelopment()
+	if err != nil {
+		t.Fatalf("failed to create logger: %v", err)
+	}
+	svc := NewService(storage.NewMarketStorage([]*domain.Market{}), log)
 
 	resp, err := svc.ViewMarkets(context.Background(), nil)
 

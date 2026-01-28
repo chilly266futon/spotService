@@ -31,14 +31,14 @@ func main() {
 	// Загрузка конфигурации
 	cfg := config.MustLoad(*configPath)
 
-	// Инициализация logger
-	logger, err := logger.New(cfg.Logger)
+	// Инициализация logger из конфига
+	l, err := logger.New(cfg.Logger)
 	if err != nil {
-		log.Fatalf("failed to create logger: %v", err)
+		log.Fatalf("failed to create l: %v", err)
 	}
-	defer logger.Sync()
+	defer l.Sync()
 
-	logger.Info("starting spot-service",
+	l.Info("starting spot-service",
 		zap.String("version", "1.0.0"),
 		zap.String("config", *configPath),
 	)
@@ -47,12 +47,12 @@ func main() {
 	markets := loadMarketsFromConfig(cfg)
 	marketStorage := storage.NewMarketStorage(markets)
 
-	logger.Info("loaded markets",
+	l.Info("loaded markets",
 		zap.Int("count", marketStorage.Count()),
 	)
 
 	// Создание сервиса
-	spotService := service.NewService(marketStorage)
+	spotService := service.NewService(marketStorage, l)
 
 	// Настройка interceptors
 	var interceptorChain []grpc.ServerOption
@@ -64,7 +64,7 @@ func main() {
 
 	// Panic recovery
 	interceptorChain = append(interceptorChain,
-		grpc.ChainUnaryInterceptor(interceptors.UnaryPanicRecoveryInterceptor(logger)),
+		grpc.ChainUnaryInterceptor(interceptors.UnaryPanicRecoveryInterceptor(l)),
 	)
 
 	// Rate limiting
@@ -83,12 +83,12 @@ func main() {
 			grpc.ChainUnaryInterceptor(rateLimiter.Interceptor()),
 		)
 
-		logger.Info("rate limiting enabled")
+		l.Info("rate limiting enabled")
 	}
 
-	// Logger interceptor (последний в цепочке)
+	// Logger
 	interceptorChain = append(interceptorChain,
-		grpc.ChainUnaryInterceptor(interceptors.LoggerInterceptor(logger)),
+		grpc.ChainUnaryInterceptor(interceptors.LoggerInterceptor(l)),
 	)
 
 	// Создание gRPC сервера
@@ -98,7 +98,7 @@ func main() {
 			Port:            cfg.Server.Port,
 			ShutdownTimeout: cfg.Server.ShutdownTimeout,
 		},
-		logger,
+		l,
 		interceptorChain...,
 	)
 	if err != nil {
@@ -111,15 +111,16 @@ func main() {
 	// Health check
 	if cfg.Health.Enabled {
 		healthServer := health.NewServer()
-		healthServer.SetHealthy("spot.v1.SpotInstrumentService")
+		healthServer.SetHealthy("spot_v1.SpotInstrumentService")
 		grpc_health_v1.RegisterHealthServer(grpcServer.GRPCServer(), healthServer)
-		logger.Info("health check enabled")
+		l.Info("health check enabled")
 	}
 
 	// Reflection для grpcui
 	reflection.Register(grpcServer.GRPCServer())
 
 	// Запуск сервера (с graceful shutdown)
+	l.Info("server ready to accept connections")
 	if err := grpcServer.Start(); err != nil {
 		log.Fatalf("server error: %v", err)
 	}

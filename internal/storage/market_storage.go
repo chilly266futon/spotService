@@ -1,9 +1,10 @@
 package storage
 
 import (
-	"github.com/chilly266futon/spotService/internal/domain"
 	"sync"
 	"time"
+
+	"github.com/chilly266futon/spotService/internal/domain"
 )
 
 type MarketStorage struct {

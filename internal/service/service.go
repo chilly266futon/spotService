@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/chilly266futon/spotService/pkg/shared/interceptors"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -15,12 +17,14 @@ import (
 type Service struct {
 	spotv1.UnimplementedSpotInstrumentServiceServer
 	storage *storage.MarketStorage
+	logger  *zap.Logger
 }
 
 // NewService создает новый сервис
-func NewService(storage *storage.MarketStorage) *Service {
+func NewService(storage *storage.MarketStorage, logger *zap.Logger) *Service {
 	return &Service{
 		storage: storage,
+		logger:  logger,
 	}
 }
 
@@ -30,12 +34,22 @@ func (s *Service) ViewMarkets(ctx context.Context, req *spotv1.ViewMarketsReques
 		return nil, status.Error(codes.InvalidArgument, "request is required")
 	}
 
+	traceID := interceptors.GetTraceID(ctx)
+
 	// Получаем все доступные рынки
 	markets := s.storage.GetAvailable()
 
 	// Фильтруем по ролям пользователя
 	var result []*spotv1.Market
 	for _, market := range markets {
+		if !market.Enabled || market.DeletedAt != nil {
+			s.logger.Info("market unavailable",
+				zap.String("trace_id", traceID),
+				zap.String("market_id", market.ID),
+				zap.Bool("enabled", market.Enabled),
+				zap.Bool("deleted", market.DeletedAt != nil),
+			)
+		}
 		if market.IsAccessibleForRoles(req.UserRoles) {
 			result = append(result, mapDomainMarketToProto(market))
 		}
