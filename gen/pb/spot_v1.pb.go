@@ -9,7 +9,6 @@ package spotv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -237,7 +236,7 @@ var File_spot_v1_proto protoreflect.FileDescriptor
 
 const file_spot_v1_proto_rawDesc = "" +
 	"\n" +
-	"\rspot_v1.proto\x12\aspot.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"F\n" +
+	"\rspot_v1.proto\x12\aspot.v1\"F\n" +
 	"\x12ViewMarketsRequest\x120\n" +
 	"\n" +
 	"user_roles\x18\x01 \x03(\x0e2\x11.spot.v1.UserRoleR\tuserRoles\"@\n" +
@@ -255,7 +254,7 @@ const file_spot_v1_proto_rawDesc = "" +
 	"\x11USER_ROLE_PREMIUM\x10\x03\x12\x13\n" +
 	"\x0fUSER_ROLE_ADMIN\x10\x042a\n" +
 	"\x15SpotInstrumentService\x12H\n" +
-	"\vViewMarkets\x12\x1b.spot.v1.ViewMarketsRequest\x1a\x1c.spot.v1.ViewMarketsResponseB\x1eZ\x1cspotService/gen/pb/v1;spotv1b\x06proto3"
+	"\vViewMarkets\x12\x1b.spot.v1.ViewMarketsRequest\x1a\x1c.spot.v1.ViewMarketsResponseB\x1fZ\x1dspot-service/gen/pb/v1;spotv1b\x06proto3"
 
 var (
 	file_spot_v1_proto_rawDescOnce sync.Once

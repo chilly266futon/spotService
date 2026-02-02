@@ -1,4 +1,4 @@
-.PHONY: all build gen test help
+.PHONY: build run gen test help
 
 gen:
 	@mkdir -p gen/pb
@@ -11,19 +11,18 @@ gen:
 		  --go-grpc_opt=paths=source_relative \
 		  {} \;
 
-all: deps test build
-
 build:
-	go build -o bin/server cmd/main.go
+	go build -o bin/spot_service cmd/main.go
 
 run: build
-	./bin/server -config configs/config.yaml
+	./bin/spot_service -config configs/config.yaml
 
 test:
 	go test ./... -v
 
 deps:
 	go mod download
+	go mod tidy
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 

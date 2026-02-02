@@ -1,0 +1,18 @@
+services:
+  spot-service:
+    build:
+      context: .
+    container_name: spot-service
+    ports:
+      - "50052:50052"
+
+  order-service:
+    build:
+      context: ../order-service
+    container_name: order-service
+    depends_on:
+      - spot-service
+    ports:
+      - "50051:50051"
+
+      
