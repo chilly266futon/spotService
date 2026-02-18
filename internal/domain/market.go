@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	spotpb "github.com/chilly266futon/exchange-service-contracts/gen/pb/spot"
 )
 
 type Market struct {
@@ -12,19 +12,19 @@ type Market struct {
 	Description  string
 	Enabled      bool
 	DeletedAt    *time.Time
-	AllowedRoles []spotv1.UserRole
+	AllowedRoles []spotpb.UserRole
 }
 
 func (m *Market) IsAvailable() bool {
 	return m.Enabled && m.DeletedAt == nil
 }
 
-func (m *Market) IsAccessibleForRoles(userRoles []spotv1.UserRole) bool {
+func (m *Market) IsAccessibleForRoles(userRoles []spotpb.UserRole) bool {
 	if len(m.AllowedRoles) == 0 {
 		return true
 	}
 
-	allowedMap := make(map[spotv1.UserRole]bool, len(m.AllowedRoles))
+	allowedMap := make(map[spotpb.UserRole]bool, len(m.AllowedRoles))
 	for _, role := range m.AllowedRoles {
 		allowedMap[role] = true
 	}

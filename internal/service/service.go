@@ -3,19 +3,19 @@ package service
 import (
 	"context"
 
-	"github.com/chilly266futon/spotService/pkg/shared/interceptors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	spotpb "github.com/chilly266futon/exchange-service-contracts/gen/pb/spot"
 	"github.com/chilly266futon/spotService/internal/domain"
 	"github.com/chilly266futon/spotService/internal/storage"
+	"github.com/chilly266futon/spotService/pkg/shared/interceptors"
 )
 
 // Service реализует SpotInstrumentService
 type Service struct {
-	spotv1.UnimplementedSpotInstrumentServiceServer
+	spotpb.UnimplementedSpotInstrumentServiceServer
 	storage *storage.MarketStorage
 	logger  *zap.Logger
 }
@@ -29,7 +29,7 @@ func NewService(storage *storage.MarketStorage, logger *zap.Logger) *Service {
 }
 
 // ViewMarkets возвращает список доступных рынков для указанных ролей
-func (s *Service) ViewMarkets(ctx context.Context, req *spotv1.ViewMarketsRequest) (*spotv1.ViewMarketsResponse, error) {
+func (s *Service) ViewMarkets(ctx context.Context, req *spotpb.ViewMarketsRequest) (*spotpb.ViewMarketsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is required")
 	}
@@ -40,7 +40,7 @@ func (s *Service) ViewMarkets(ctx context.Context, req *spotv1.ViewMarketsReques
 	markets := s.storage.GetAvailable()
 
 	// Фильтруем по ролям пользователя
-	var result []*spotv1.Market
+	var result []*spotpb.Market
 	for _, market := range markets {
 		if !market.Enabled || market.DeletedAt != nil {
 			s.logger.Info("market unavailable",
@@ -55,14 +55,14 @@ func (s *Service) ViewMarkets(ctx context.Context, req *spotv1.ViewMarketsReques
 		}
 	}
 
-	return &spotv1.ViewMarketsResponse{
+	return &spotpb.ViewMarketsResponse{
 		Markets: result,
 	}, nil
 }
 
 // mapDomainMarketToProto преобразует доменную модель в proto
-func mapDomainMarketToProto(m *domain.Market) *spotv1.Market {
-	return &spotv1.Market{
+func mapDomainMarketToProto(m *domain.Market) *spotpb.Market {
+	return &spotpb.Market{
 		Id:          m.ID,
 		Name:        m.Name,
 		Description: m.Description,

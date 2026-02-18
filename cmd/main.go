@@ -10,11 +10,12 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	spotv1 "github.com/chilly266futon/spotService/gen/pb"
 	"github.com/chilly266futon/spotService/internal/config"
 	"github.com/chilly266futon/spotService/internal/domain"
 	"github.com/chilly266futon/spotService/internal/service"
 	"github.com/chilly266futon/spotService/internal/storage"
+
+	spotpb "github.com/chilly266futon/exchange-service-contracts/gen/pb/spot"
 
 	// Shared пакеты из того же репозитория
 	"github.com/chilly266futon/spotService/pkg/shared/grpcutil"
@@ -106,7 +107,7 @@ func main() {
 	}
 
 	// Регистрация сервисов
-	spotv1.RegisterSpotInstrumentServiceServer(grpcServer.GRPCServer(), spotService)
+	spotpb.RegisterSpotInstrumentServiceServer(grpcServer.GRPCServer(), spotService)
 
 	// Health check
 	if cfg.Health.Enabled {
@@ -145,14 +146,14 @@ func loadMarketsFromConfig(cfg *config.Config) []*domain.Market {
 }
 
 // parseRoles преобразует строки в proto enums
-func parseRoles(roles []string) []spotv1.UserRole {
-	result := make([]spotv1.UserRole, 0, len(roles))
+func parseRoles(roles []string) []spotpb.UserRole {
+	result := make([]spotpb.UserRole, 0, len(roles))
 
-	roleMap := map[string]spotv1.UserRole{
-		"USER_ROLE_COMMON":   spotv1.UserRole_USER_ROLE_COMMON,
-		"USER_ROLE_VERIFIED": spotv1.UserRole_USER_ROLE_VERIFIED,
-		"USER_ROLE_PREMIUM":  spotv1.UserRole_USER_ROLE_PREMIUM,
-		"USER_ROLE_ADMIN":    spotv1.UserRole_USER_ROLE_ADMIN,
+	roleMap := map[string]spotpb.UserRole{
+		"USER_ROLE_COMMON":   spotpb.UserRole_USER_ROLE_COMMON,
+		"USER_ROLE_VERIFIED": spotpb.UserRole_USER_ROLE_VERIFIED,
+		"USER_ROLE_PREMIUM":  spotpb.UserRole_USER_ROLE_PREMIUM,
+		"USER_ROLE_ADMIN":    spotpb.UserRole_USER_ROLE_ADMIN,
 	}
 
 	for _, roleStr := range roles {

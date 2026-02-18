@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	spotpb "github.com/chilly266futon/exchange-service-contracts/gen/pb/spot"
 	"github.com/chilly266futon/spotService/internal/domain"
 	"github.com/chilly266futon/spotService/internal/storage"
 )
@@ -42,7 +42,7 @@ func TestViewMarkets_ReturnsOnlyActiveMarkets(t *testing.T) {
 	}
 	svc := NewService(storage.NewMarketStorage(markets), log)
 
-	resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{})
+	resp, err := svc.ViewMarkets(context.Background(), &spotpb.ViewMarketsRequest{})
 
 	require.NoError(t, err)
 	assert.Len(t, resp.Markets, 1)
@@ -55,19 +55,19 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 			ID:           "common-market",
 			Name:         "Common Market",
 			Enabled:      true,
-			AllowedRoles: []spotv1.UserRole{spotv1.UserRole_USER_ROLE_COMMON},
+			AllowedRoles: []spotpb.UserRole{spotpb.UserRole_USER_ROLE_COMMON},
 		},
 		{
 			ID:           "premium-market",
 			Name:         "Premium Market",
 			Enabled:      true,
-			AllowedRoles: []spotv1.UserRole{spotv1.UserRole_USER_ROLE_PREMIUM},
+			AllowedRoles: []spotpb.UserRole{spotpb.UserRole_USER_ROLE_PREMIUM},
 		},
 		{
 			ID:           "public-market",
 			Name:         "Public Market",
 			Enabled:      true,
-			AllowedRoles: []spotv1.UserRole{}, // Доступно всем
+			AllowedRoles: []spotpb.UserRole{}, // Доступно всем
 		},
 	}
 
@@ -79,8 +79,8 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 	svc := NewService(storage.NewMarketStorage(markets), log)
 
 	t.Run("common user sees common and public markets", func(t *testing.T) {
-		resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{
-			UserRoles: []spotv1.UserRole{spotv1.UserRole_USER_ROLE_COMMON},
+		resp, err := svc.ViewMarkets(context.Background(), &spotpb.ViewMarketsRequest{
+			UserRoles: []spotpb.UserRole{spotpb.UserRole_USER_ROLE_COMMON},
 		})
 
 		require.NoError(t, err)
@@ -97,10 +97,10 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 	})
 
 	t.Run("premium user sees all markets", func(t *testing.T) {
-		resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{
-			UserRoles: []spotv1.UserRole{
-				spotv1.UserRole_USER_ROLE_COMMON,
-				spotv1.UserRole_USER_ROLE_PREMIUM,
+		resp, err := svc.ViewMarkets(context.Background(), &spotpb.ViewMarketsRequest{
+			UserRoles: []spotpb.UserRole{
+				spotpb.UserRole_USER_ROLE_COMMON,
+				spotpb.UserRole_USER_ROLE_PREMIUM,
 			},
 		})
 
@@ -109,8 +109,8 @@ func TestViewMarkets_FilterByRoles(t *testing.T) {
 	})
 
 	t.Run("user without roles sees only public market", func(t *testing.T) {
-		resp, err := svc.ViewMarkets(context.Background(), &spotv1.ViewMarketsRequest{
-			UserRoles: []spotv1.UserRole{},
+		resp, err := svc.ViewMarkets(context.Background(), &spotpb.ViewMarketsRequest{
+			UserRoles: []spotpb.UserRole{},
 		})
 
 		require.NoError(t, err)

@@ -7,12 +7,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	spotv1 "github.com/chilly266futon/spotService/gen/pb"
+	spotpb "github.com/chilly266futon/exchange-service-contracts/gen/pb/spot"
 )
 
 type Client struct {
 	conn   *grpc.ClientConn
-	client spotv1.SpotInstrumentServiceClient
+	client spotpb.SpotInstrumentServiceClient
 }
 
 type Config struct {
@@ -30,7 +30,7 @@ func New(cfg Config) (*Client, error) {
 
 	return &Client{
 		conn:   conn,
-		client: spotv1.NewSpotInstrumentServiceClient(conn),
+		client: spotpb.NewSpotInstrumentServiceClient(conn),
 	}, nil
 }
 
@@ -41,8 +41,8 @@ func (c *Client) Close() error {
 	return nil
 }
 
-func (c *Client) ViewMarkets(ctx context.Context, userRoles []spotv1.UserRole) ([]*spotv1.Market, error) {
-	resp, err := c.client.ViewMarkets(ctx, &spotv1.ViewMarketsRequest{
+func (c *Client) ViewMarkets(ctx context.Context, userRoles []spotpb.UserRole) ([]*spotpb.Market, error) {
+	resp, err := c.client.ViewMarkets(ctx, &spotpb.ViewMarketsRequest{
 		UserRoles: userRoles,
 	})
 	if err != nil {
@@ -51,6 +51,6 @@ func (c *Client) ViewMarkets(ctx context.Context, userRoles []spotv1.UserRole) (
 	return resp.Markets, nil
 }
 
-func (c *Client) GetClient() spotv1.SpotInstrumentServiceClient {
+func (c *Client) GetClient() spotpb.SpotInstrumentServiceClient {
 	return c.client
 }
